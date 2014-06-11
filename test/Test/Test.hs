@@ -7,7 +7,7 @@ import Test.Framework.Providers.HUnit (testCase)
 --import Test.QuickCheck (NonNegative(..), (==>))
 import Test.HUnit (assertEqual)
 
-import Database.Kafka.RdKafka.C
+import Database.Kafka.RdKafka.Interface
 
 -----------------
 -- Properties
@@ -21,8 +21,14 @@ import Database.Kafka.RdKafka.C
 case_librdkafka_version = do
   assertEqual "for the version check" "0.8.3" version
 
+case_librdkafka_errors = do
+  assertEqual "for partition errors" "Local: Unknown partition" (errorToString error_unknown_partition)
+  assertEqual "for message size errors" "Broker: Invalid message size" (errorToString error_invalid_msg_size)
+  assertEqual "for no errors" "Success" (errorToString error_no_error)
+
 tests = [
-   testGroup "librdkafka" [
-     testCase "Version" case_librdkafka_version
+   testGroup "librdkafka basics" [
+     testCase "version" case_librdkafka_version
+    ,testCase "errors" case_librdkafka_errors
     ]
   ]
