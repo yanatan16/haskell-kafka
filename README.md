@@ -1,4 +1,4 @@
-haskell-kafka
+haskell-kafka [![Build Status](https://travis-ci.org/yanatan16/haskell-kafka.svg)](https://travis-ci.org/yanatan16/haskell-kafka)
 =============
 
 An Apache Kafka driver in Haskell using the C driver [librdkafka](https://github.com/edenhill/librdkafka).
