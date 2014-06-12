@@ -15,7 +15,7 @@ install:
 
   ## Install librdkafka
   - wget https://github.com/edenhill/librdkafka/archive/master.tar.gz
-  - tar xzvf master.zip
+  - tar xzvf master.tar.gz
   - cd librdkafka-master
   - ./configure
   - make
