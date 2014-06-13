@@ -3,7 +3,7 @@
 module Database.Kafka.RdKafka.Headers (
   version,
 
-  KafkaMode (),
+  RdKafkaMode (),
   producer_mode, consumer_mode
 ) where
 
@@ -29,9 +29,9 @@ version = unsafePerformIO $ peekCString $ c_rd_kafka_version_str
 -----------------
 
 -- Kafka Modes
-newtype KafkaMode = KafkaMode { unKafkaMode :: CInt }
+newtype RdKafkaMode = RdKafkaMode { unRdKafkaMode :: CInt }
   deriving (Show)
-#{enum KafkaMode, KafkaMode
+#{enum RdKafkaMode, RdKafkaMode
   , producer_mode       = RD_KAFKA_PRODUCER
   , consumer_mode       = RD_KAFKA_CONSUMER
   }

@@ -1,7 +1,7 @@
 {-# LANGUAGE CPP, ForeignFunctionInterface #-}
 
 module Database.Kafka.RdKafka.Errors (
-  KafkaError (),
+  RdKafkaError (),
   errorToString, errnoToString,
 
   error_begin, error_bad_msg, error_bad_compression, error_destroy, error_fail, error_transport, error_crit_sys_resource,
@@ -22,22 +22,22 @@ import System.IO.Unsafe (unsafePerformIO)
 
 -- Kafka Errors
 
-newtype KafkaError = KafkaError { unKafkaError :: CInt }
+newtype RdKafkaError = RdKafkaError { unRdKafkaError :: CInt }
   deriving (Show,Eq)
 
 foreign import ccall unsafe "rdkafka.h rd_kafka_err2str"
-  c_rd_kafka_err2str :: KafkaError -> CString
+  c_rd_kafka_err2str :: RdKafkaError -> CString
 
 foreign import ccall unsafe "rdkafka.h rd_kafka_errno2err"
-  c_rd_kafka_errno2err :: Errno -> KafkaError
+  c_rd_kafka_errno2err :: Errno -> RdKafkaError
 
-errorToString :: KafkaError -> String
+errorToString :: RdKafkaError -> String
 errorToString err = unsafePerformIO $ peekCString $ c_rd_kafka_err2str err
 
 errnoToString :: Errno -> String
 errnoToString = unsafePerformIO . peekCString . c_rd_kafka_err2str . c_rd_kafka_errno2err
 
-#{enum KafkaError, KafkaError
+#{enum RdKafkaError, RdKafkaError
   , error_begin = RD_KAFKA_RESP_ERR__BEGIN
   , error_bad_msg = RD_KAFKA_RESP_ERR__BAD_MSG
   , error_bad_compression = RD_KAFKA_RESP_ERR__BAD_COMPRESSION
