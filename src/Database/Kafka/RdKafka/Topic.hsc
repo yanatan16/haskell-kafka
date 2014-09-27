@@ -1,16 +1,19 @@
 {-# LANGUAGE CPP, ForeignFunctionInterface #-}
 
 module Database.Kafka.RdKafka.Topic (
+  RdKafkaTopic, RdKafkaTopicRaw,
+  newTopic,
+  topicName,
+  wrapTopicRaw
 ) where
 
-import Foreign (ForeignPtr)
-import Foreign.C.Types (CInt, CLong, CSize)
-import Foreign.C.String (CString, peekCString)
-import Foreign.Ptr (Ptr, nullPtr)
+import Foreign hiding (unsafePerformIO)
+import Foreign.C.Types
+import Foreign.C.String
 import System.IO.Unsafe (unsafePerformIO)
 
-import Database.Kafka.RdKafka.Errors (RdKafkaError)
-import Database.Kafka.RdKafka.Headers (RdKafkaPtr)
+import Database.Kafka.RdKafka.Kafka (RdKafka, RdKafkaRaw)
+import Database.Kafka.RdKafka.TopicConf (RdKafkaTopicConf, RdKafkaTopicConfRaw)
 
 #include <librdkafka/rdkafka.h>
 
@@ -18,28 +21,33 @@ import Database.Kafka.RdKafka.Headers (RdKafkaPtr)
 -- Topics
 -----------
 
-newtype RdKafkaTopic
-type RdKafkaTopicPtr = ForeignPtr RdKafkaTopic
-newtype RdKafkaTopicConf
-type RdKafkaTopicConfPtr = ForeignPtr RdKafkaTopicConf
+data RdKafkaTopicBase
+type RdKafkaTopicRaw = Ptr RdKafkaTopicBase
+type RdKafkaTopic = ForeignPtr RdKafkaTopicBase
 
 
 foreign import ccall unsafe "rdkafka.h &rd_kafka_topic_destroy"
-  c_rd_kafka_topic_destroy :: FunPtr (Ptr RdKafkaTopic -> IO ())
+  c_rd_kafka_topic_destroy :: FunPtr (RdKafkaTopicRaw -> IO ())
 
 foreign import ccall unsafe "rdkafka.h rd_kafka_topic_new"
-  c_rd_kafka_topic_new :: RdKafkaPtr
-                       -> String
-                       -> RdKafkaTopicConfPtr
-                       -> IO (Ptr RdKafkaTopic)
+  c_rd_kafka_topic_new :: RdKafkaRaw
+                       -> CString
+                       -> RdKafkaTopicConfRaw
+                       -> IO RdKafkaTopicRaw
 
-foreign import ccall unsafe "rdkafka.h &rd_kafka_topic_conf_destroy"
-  c_rd_kafka_topic_conf_destroy :: FunPtr (Ptr RdKafkaTopicConf -> IO ())
+foreign import ccall unsafe "rdkafka.h rd_kafka_topic_name"
+  c_rd_kafka_topic_name :: RdKafkaTopicRaw
+                        -> CString
 
-foreign import ccall unsafe "rdkafka.h rd_kafka_topic_conf_new"
-  c_rd_kafka_topic_conf_new :: IO (Ptr RdKafkaTopicConf)
+newTopic :: RdKafka -> String -> RdKafkaTopicConf -> RdKafkaTopic
+newTopic k t conf = unsafePerformIO $ withCString t $ \ct ->
+  withForeignPtr k $ \rk ->
+    withForeignPtr conf $ \rconf -> do
+      ptr <- c_rd_kafka_topic_new rk ct rconf
+      wrapTopicRaw ptr
 
-foreign import ccall unsafe "rdkafka.h rd_kafka_topic_conf_new"
-  c_rd_kafka_topic_conf_new :: RdKafkaTopicConfPtr -> IO (Ptr RdKafkaTopicConf)
+topicName :: RdKafkaTopic -> String
+topicName rkt = unsafePerformIO $ withForeignPtr rkt (peekCString . c_rd_kafka_topic_name)
 
-
+wrapTopicRaw :: RdKafkaTopicRaw -> IO RdKafkaTopic
+wrapTopicRaw = newForeignPtr c_rd_kafka_topic_destroy

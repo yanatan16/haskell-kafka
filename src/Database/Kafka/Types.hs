@@ -5,11 +5,11 @@ module Database.Kafka.Types (
   Offset,
   Producer,
   Consumer,
+  TopicConfig,
   ProducerConfig,
-  ConsumerConfig
+  ConsumerConfig,
+  KafkaConfig
 ) where
-
-import import qualified Data.ByteString as B
 
 newtype Partition = Partition { unPartition :: Int }
   deriving (Show, Eq)
@@ -28,10 +28,12 @@ data Message k v = Message {
   messageValue :: v
 } deriving (Show)
 
-data Producer = ()
-data ProducerConfig = ()
-data ConsumerConfig = ()
-data Consumer = ()
+data Producer = Producer ()
+data ProducerConfig = ProducerConfig ()
+data ConsumerConfig = ConsumerConfig ()
+data Consumer = Consumer ()
 
 
 
+data TopicConfig = TopicConfig ()
+data KafkaConfig = KafkaConfig ()

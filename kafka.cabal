@@ -20,14 +20,26 @@ library
   default-language:    Haskell2010
   exposed-modules:     Database.Kafka,
                        Database.Kafka.RdKafka.Interface
-  other-modules:       Database.Kafka.RdKafka.Errors
-                       Database.Kafka.RdKafka.Headers
+  other-modules:       Database.Kafka.RdKafka.Errors,
+                       Database.Kafka.RdKafka.Headers,
+                       Database.Kafka.RdKafka.Conf,
+                       Database.Kafka.RdKafka.Kafka,
+                       Database.Kafka.RdKafka.Message,
+                       Database.Kafka.RdKafka.Metadata,
+                       Database.Kafka.RdKafka.Topic,
+                       Database.Kafka.RdKafka.TopicConf,
+                       Database.Kafka.RdKafka.Consumer,
+                       Database.Kafka.RdKafka.Producer,
+                       Database.Kafka.Types
   hs-source-dirs:       src
   extra-libraries:     rdkafka
-  build-depends:       base ==4.6.*,
-                       bytestring ==0.10.*
-  default-extensions: GeneralizedNewtypeDeriving
-  other-extensions: CPP, ForeignFunctionInterface
+  build-depends:       base >= 4,
+                       bytestring >=0.10,
+                       containers >=0.5
+  default-extensions: GeneralizedNewtypeDeriving,
+                      EmptyDataDecls,
+                      DeriveDataTypeable
+  other-extensions:   CPP, ForeignFunctionInterface
 
 test-suite tests
   default-language: Haskell2010
